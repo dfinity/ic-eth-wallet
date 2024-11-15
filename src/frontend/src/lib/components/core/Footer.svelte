@@ -66,7 +66,7 @@
 			class:1.5md:translate-x-0={$authSignedIn}
 		>
 			<div class="flex flex-row items-center gap-2">
-				<IconDfinity />
+				<IconDfinity size="30" />
 				<span
 					class:md:hidden={$authSignedIn}
 					class:xl:flex={$authSignedIn}
