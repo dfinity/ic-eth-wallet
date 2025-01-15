@@ -2,16 +2,21 @@ import {
 	LOADER_MODAL,
 	LOGIN_BUTTON,
 	LOGOUT_BUTTON,
+	MANAGE_TOKEN_LIST_SAVE,
 	NAVIGATION_ITEM_HOMEPAGE,
+	NAVIGATION_ITEM_MANAGE_LIST,
 	NAVIGATION_ITEM_SETTINGS,
 	NAVIGATION_MENU,
 	NAVIGATION_MENU_BUTTON,
+	NAVIGATION_MENU_NETWORKS,
+	NETWORK,
 	RECEIVE_TOKENS_MODAL,
 	RECEIVE_TOKENS_MODAL_OPEN_BUTTON,
 	RECEIVE_TOKENS_MODAL_QR_CODE_OUTPUT,
 	TESTNET_TOGGLE,
 	TOKEN_BALANCE,
-	TOKEN_CARD
+	TOKEN_CARD,
+	TOKEN_TOGGLE
 } from '$lib/constants/test-ids.constants';
 import { type InternetIdentityPage } from '@dfinity/internet-identity-playwright';
 import { isNullish, nonNullish } from '@dfinity/utils';
@@ -239,6 +244,30 @@ abstract class Homepage {
 		await this.navigateTo(NAVIGATION_ITEM_SETTINGS);
 		await this.clickByTestId(TESTNET_TOGGLE);
 		await this.clickByTestId(NAVIGATION_ITEM_HOMEPAGE);
+	}
+
+	async toggleTokenInList({
+		tokenSymbol,
+		networkName
+	}: {
+		tokenSymbol: string;
+		networkName: string;
+	}): Promise<void> {
+		await this.clickByTestId(NAVIGATION_MENU_NETWORKS);
+		await this.#page.click(`[data-tid^="${NETWORK}-${networkName}"]`);
+		await this.clickByTestId(NAVIGATION_ITEM_MANAGE_LIST);
+		await this.#page.click(`[data-tid^="${TOKEN_TOGGLE}-${tokenSymbol}"]`);
+		await this.clickByTestId(MANAGE_TOKEN_LIST_SAVE);
+	}
+
+	getTokenCardLocator({
+		tokenSymbol,
+		networkSymbol
+	}: {
+		tokenSymbol: string;
+		networkSymbol: string;
+	}): Locator {
+		return this.#page.locator(`[data-tid="${TOKEN_CARD}-${tokenSymbol}-${networkSymbol}"]`);
 	}
 
 	async takeScreenshot(): Promise<void> {

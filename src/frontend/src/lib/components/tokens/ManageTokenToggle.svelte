@@ -7,6 +7,7 @@
 	import type { SplTokenToggleable } from '$sol/types/spl-token-toggleable';
 
 	export let token: EthereumUserToken | SplTokenToggleable;
+	export let testIdPrefix = 'token-toggle';
 
 	let disabled = false;
 	$: disabled = isEthereumTokenToggleDisabled(token);
@@ -37,6 +38,7 @@
 <div role="button" on:click={onClick}>
 	<Toggle
 		ariaLabel={checked ? $i18n.tokens.text.hide_token : $i18n.tokens.text.show_token}
+		testId={`${testIdPrefix}-${token.symbol}-${token.network.id.description}`}
 		{disabled}
 		bind:checked
 		on:nnsToggle={toggle}
