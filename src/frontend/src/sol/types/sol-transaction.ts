@@ -1,7 +1,16 @@
 import { solTransactionTypes } from '$lib/schema/transaction.schema';
 import type { TransactionType, TransactionUiCommon } from '$lib/types/transaction';
-import type { GetSignaturesForAddressApi, GetTransactionApi } from '@solana/rpc';
-import type { Commitment } from '@solana/rpc-types';
+import type { Address } from '@solana/addresses';
+import type { GetSignaturesForAddressApi } from '@solana/rpc';
+import type {
+	Base58EncodedBytes,
+	Commitment,
+	Lamports,
+	Reward,
+	TokenBalance,
+	TransactionError,
+	UnixTimestamp
+} from '@solana/rpc-types';
 
 export type SolTransactionType = Extract<
 	TransactionType,
@@ -16,10 +25,33 @@ export interface SolTransactionUi extends TransactionUiCommon {
 	fee?: bigint;
 }
 
-export type SolRpcTransaction = NonNullable<ReturnType<GetTransactionApi['getTransaction']>> & {
+export interface SolRpcTransaction {
 	id: string;
+	blockTime: UnixTimestamp | null;
 	confirmationStatus: Commitment | null;
-};
+	meta: {
+		computeUnitsConsumed?: bigint;
+		err: TransactionError | null;
+		fee: Lamports;
+		logMessages: readonly string[] | null;
+		postBalances: readonly Lamports[];
+		postTokenBalances?: readonly TokenBalance[];
+		preBalances: readonly Lamports[];
+		preTokenBalances?: readonly TokenBalance[];
+		rewards: readonly Reward[] | null;
+	} | null;
+	transaction: {
+		message: {
+			accountKeys: readonly Address[];
+			instructions: readonly {
+				accounts: readonly number[];
+				data: Base58EncodedBytes;
+				programIdIndex: number;
+				stackHeight?: number;
+			}[];
+		};
+	};
+}
 
 export type SolSignature = ReturnType<
 	GetSignaturesForAddressApi['getSignaturesForAddress']

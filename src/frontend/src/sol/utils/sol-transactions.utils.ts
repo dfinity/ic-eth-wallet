@@ -25,6 +25,7 @@ export const getSolBalanceChange = ({ transaction, address }: TransactionWithAdd
 /**
  * It maps a transaction to a Solana transaction UI object
  */
+// TODO: improve this function to decode/parse correctly the transaction instructions. Example https://github.com/solana-fm/explorer-kit/tree/main#-usage
 export const mapSolTransactionUi = ({
 	transaction,
 	address
@@ -42,16 +43,21 @@ export const mapSolTransactionUi = ({
 	const nonSystemAccountKeys = accountKeys.filter((key) => !SYSTEM_ACCOUNT_KEYS.includes(key));
 
 	const from = accountKeys[0];
+
 	//edge-case: transaction from my wallet, to my wallet
 	const to = nonSystemAccountKeys.length === 1 ? nonSystemAccountKeys[0] : accountKeys[1];
 
-	const { fee } = meta ?? {};
+	const isSender = from === address;
 
-	const relevantFee = from === address ? (fee ?? 0n) : 0n;
+	const accountIndex = accountKeys.indexOf(solAddress(address));
+
+	const { preBalances, postBalances, fee } = meta ?? {};
+
+	const relevantFee = isSender ? (fee ?? 0n) : 0n;
 
 	const amount = getSolBalanceChange({ transaction, address }) + relevantFee;
 
-	const type = amount > 0n ? 'receive' : 'send';
+	const type = isSender ? 'receive' : 'send';
 
 	return {
 		id,
